@@ -1,0 +1,6 @@
+{
+    "repo-name": {
+        "path": "where-to-pull",
+        "watch-branch": "branch-to-watch"
+    }
+}
