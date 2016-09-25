@@ -10,18 +10,13 @@ import subprocess
 import flask
 
 APP = flask.Flask(__name__)
+DEF_PATH = os.getcwd()
 
 def cfg_load(path):
     """
-    Loads the config file. The config file
-    maps repo names to paths. It also says
-    which branch to watch. Example:
-    {
-        "repo-name": {
-            "path": "path-to-repo",
-            "watch-branch": "name-of-branch"
-        }
-    }
+    Loads the config file. The config file maps
+    repo names to paths. It also says which branch
+    to watch. Example in config/example-config.json.
     """
     with open(path) as data_file:
         data = json.load(data_file)
@@ -31,10 +26,9 @@ def cfg_load(path):
 def receiver():
     """
     This function gets run when a POST to
-    localhost/ci-server occures. It then
-    cd's to the path provided by the config
-    file and pulls the updated source from
-    github.
+    localhost/ci-server occures. It then cd's to
+    the path provided by the config file and pulls
+    the updated source from github.
     """
     if flask.request.method == "POST":
         if flask.request.headers.get("X-GitHub-Event") == "push":
@@ -50,10 +44,12 @@ def receiver():
                 os.chdir(cfg[res["repository"]["name"]]["path"])
                 if subprocess.call(["git", "pull", res["repository"]["url"]]) != 0:
                     return "an error occured", 500
+                os.chdir(DEF_PATH)
             except KeyError:
                 return "an error occured", 500
             return "succes", 200
         elif flask.request.headers.get("X-GitHub-Event") == "ping":
+            print("ping")
             return "succes", 200
         else:
             return "an error occured", 500
