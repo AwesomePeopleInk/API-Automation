@@ -53,5 +53,7 @@ def receiver():
             except KeyError:
                 return "an error occured", 500
             return "succes", 200
+        elif flask.request.headers.get("X-GitHub-Event") == "ping":
+            return "succes", 200
         else:
             return "an error occured", 500
